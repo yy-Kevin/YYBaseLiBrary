@@ -2,11 +2,21 @@ package com.yy.yybaselibary;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.yy.yybaselibary.ipc.Fruit;
+import com.yy.yybaselibary.ipc.IAidlInterface;
 import com.yy.yybaselibary.observer.Observable;
 import com.yy.yybaselibary.observer.Observer;
 import com.yy.yybaselibary.observer.PoliceObserver;
@@ -24,8 +34,11 @@ import com.yy.yybaselibary.test.LoadClass;
 
 
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private IAidlInterface mIAidlInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final TextView tv_hw = findViewById(R.id.tv_hw);
-        tv_hw.setOnClickListener(v -> {});
+        tv_hw.setOnClickListener(v -> {
+        });
         tv_hw.setOnClickListener(v -> tv_hw.setText(""));
 
         //静态代理
@@ -99,4 +113,35 @@ public class MainActivity extends AppCompatActivity {
 
         thief.notifyObservers();
     }
+
+    private void aidl() {
+        try {
+            mIAidlInterface.addFruit(new Fruit("app", 3));
+            List<Fruit> fruits = mIAidlInterface.getFruitList();
+            Log.e(TAG, fruits.toString());
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
+//        bindService
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName("com.yy.yybaselibary", "com.yy.yybaselibary.ipc.IAidlServer"));
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.e(TAG, "onServiceConnected: success");
+            mIAidlInterface = IAidlInterface.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.e(TAG, "onServiceDisconnected: success");
+            mIAidlInterface = null;
+        }
+    };
 }

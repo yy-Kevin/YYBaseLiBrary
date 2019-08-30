@@ -31,7 +31,6 @@ public class LoadClass {
         //第三种方式获取class （类的全路径名获取）
         Class pClass3 = Class.forName("com.yy.yybaselibary.proxy.reflex.People");
 
-
         Log.e(TAG, "pClass1 --- " + pClass1.getName());
         Log.e(TAG, "pClass2 --- " + pClass2.getName());
         Log.e(TAG, "pClass3 --- " + pClass3.getName());
@@ -117,7 +116,7 @@ public class LoadClass {
 //        constructor.setAccessible(true);
         constructor1.newInstance("zs",2);
         name.get(constructor1.newInstance("zs",2));
-
+        name.get(null);
         Log.e(TAG,"获取字段 name = " + name);
 
     }
